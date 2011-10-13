@@ -1,0 +1,4 @@
+Installable files
+
+need to install python 2.7.2 from http://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+need to install pyodbc 2.1.11 from http://pyodbc.googlecode.com/files/pyodbc-2.1.11.win32-py2.7.exe
