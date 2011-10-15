@@ -25,11 +25,21 @@ db_connection=pyodbc.connect(CONNECTION_STRING) #connection to database
 cursor=db_connection.cursor()#defining a cursor for connection
 
 cursor.execute("select * from dbo.inv_data")#Selecting all rows  ####needs work####
-row=cursor.fetchone()
-text_row=''
-for i in range(0,len(row)):
-	text_row=text_row+str(row[i])+' '
 
-stdin, stdout, stderr = ssh.exec_command('python2.7 /home/pearlwhite85/test_proj/test.py '+text_row)
-print stdout.read()
-print stderr.read()
+success_count=0
+failure_count=0
+
+for row in cursor:
+	text_row=''
+	for i in range(0,len(row)):
+		text_row=text_row+str(row[i])+' '
+	stdin, stdout, stderr = ssh.exec_command('python2.7 /home/pearlwhite85/test_proj/test.py '+text_row)
+	if stdout:
+		#print stdout.read()
+		success_count=success_count+1
+		print success_count
+	if stderr:
+		print stderr.read()
+		failure_count=failure_count+1
+ssh.close()
+cursor.close()
