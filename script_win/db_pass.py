@@ -11,7 +11,7 @@ lite_con,lite_cur=connection_script.connect_to_sqlite()
 
 ssh=connection_script.connect_to_webserver()
 
-lite_cur.execute("select * from inv_data")
+lite_cur.execute("select * from inv_data")# where status = 'N'")
 lite_rows=lite_cur.fetchall()
 print 'rowwount',len(lite_rows)
 i=0
@@ -23,7 +23,7 @@ for lite_row in lite_rows:
 		prod_cd = lite_row[0]
 		whs_num = lite_row[1]
 		updt_dt = lite_row[2]
-		ms_query="select * from inv_data where prod_cd ='" +prod_cd+"'";
+		ms_query="select * from inv_data where prod_cd ='" +prod_cd+"';"
 		ms_cur.execute(ms_query)
 		ms_row=ms_cur.fetchone()
 		text_row=''
@@ -33,5 +33,9 @@ for lite_row in lite_rows:
 		
 		if stdout:
 			lite_cur.execute("update inv_data set  status='Y' where prod_cd ='" +prod_cd+"';")
+			lite_con.commit()
 			print stdout.read()
                         print 'yes ', prod_cd
+lite_con.close()
+ms_con.close()
+ssh.close()

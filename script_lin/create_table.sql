@@ -1,3 +1,4 @@
+drop table inv_data;
 create table inv_data
 	(prod_cd char(21) not null unique,
 	whs_num char(8) not null unique,
@@ -32,4 +33,5 @@ create table inv_data
 	ALT_CD char(20),
 	UPDT_BY char(8),
 	CURRENCY_COST numeric(21,6),
-	COST_FACTOR numeric(21,6))
+	COST_FACTOR numeric(21,6));
+commit;
