@@ -29,15 +29,19 @@ WATER_QTY 	=float(argv[22])	 	#  numeric(21,6),
 ORDERSIZE 	=float(argv[23]) 		#  numeric(21,6),
 MINSTOCK 	=float(argv[24]) 		#  numeric(21,6),
 INV_LOC 	=argv[25] 				#  char(20),
-DEF_UNIT 	=argv[26] 				#  char(2),
-UPDT_DT 	=float(argv[27])	 	#  numeric(8,0),
-PHYC_DT 	=float(argv[28])	 	#  numeric(21,6),
-IMAGE_NM 	=argv[29] 				#  char(80),
-OEM_CD 		=argv[30] 				#  char(20),
-ALT_CD 		=argv[31] 				#  char(20),
-UPDT_BY  	=argv[32] 				#  char(8),
-CURRENCY_COST=argv[33] 				#  numeric(21,6),
-COST_FACTOR  =argv[34] 				#  numeric(21,6));
+UNIT_COLOR 	=argv[26] 				#  char(11)
+CLASS_CD 	=argv[27]				#  char(20)
+DESCRIP 	=argv[28]				# char(61)
+DEF_UNIT 	=argv[29] 				#  char(2),
+UPDT_DT 	=float(argv[30])	 	#  numeric(8,0),
+PHYC_DT 	=float(argv[31])	 	#  numeric(21,6),
+IMAGE_NM 	=argv[32] 				#  char(80),
+OEM_CD 		=argv[33] 				#  char(20),
+ALT_CD 		=argv[34] 				#  char(20),
+UPDT_BY  	=argv[35] 				#  char(8),
+CURRENCY_COST=float(argv[36]) 		#  numeric(21,6),
+COST_FACTOR  =float(argv[37])		#  numeric(21,6));
+
 
 print 'end'
 
