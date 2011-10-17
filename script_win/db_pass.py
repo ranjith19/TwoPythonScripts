@@ -24,7 +24,7 @@ for lite_row in lite_rows:
 			prod_cd = lite_row[0]
 			whs_num = lite_row[1]
 			updt_dt = lite_row[2]
-			ms_query="select prod_cd,whs_num,in_stock,lastrcv_qty,LASTRCV_DT,price_base,FRT_CUS,PROD_DUTY,HANDL_FEE,MISC_FEE,AVG_COST,LT_SL_DT,VENDOR,LST_ORDER,ORD_DT,STK_IND,BACK_QTY,ORDER_QTY,ON_ORDER_QTY,WIP_QTY,RMA_QTY,WATER_QTY,ORDERSIZE,MINSTOCK,INV_LOC,UNIT_COLOR,CLASS_CD,DESCRIP,DEF_UNIT,UPDT_DT,PHYC_DT,IMAGE_NM,OEM_CD,ALT_CD,UPDT_BY,CURRENCY_COST,COST_FACTOR  from inv_data where prod_cd ='" +prod_cd+"';"
+			ms_query="select prod_cd,whs_num,in_stock,lastrcv_qty,lastrcv_dt,price_base,frt_cus,prod_duty,handl_fee,misc_fee,avg_cost,lt_sl_dt,vendor,lst_order,ord_dt,stk_ind,back_qty,order_qty,on_order_qty,wip_qty,rma_qty,water_qty,ordersize,minstock,inv_loc,unit_color,class_cd,descrip,def_unit,updt_dt,phyc_dt,image_nm,oem_cd,alt_cd,updt_by,currency_cost,cost_factor  from inv_data where prod_cd ='" +prod_cd+"';"
 			ms_cur.execute(ms_query)
 			ms_row=ms_cur.fetchone()
 			print len(ms_row)
@@ -46,13 +46,13 @@ for lite_row in lite_rows:
 					if fval==0:
 						print "not parsing a zero as argument"+arg
 					else:
-						cmd=cmd+"--"+arg+"="+fval+"  "
+						cmd=cmd+"--"+arg+"="+str(fval)+"  "
 					i=i+1
 					print i,':',cmd
 					return cmd,i
 				
 			cmd,i=add_to_cmd(cmd,i,'prod_cd',ms_row.prod_cd)  
-			cmd,i=add_to_cmd(cmd,i,cmd,i,'whs_num',ms_row.whs_num)
+			cmd,i=add_to_cmd(cmd,i,'whs_num',ms_row.whs_num)
 			cmd,i=add_to_cmd(cmd,i,'in_stock',ms_row.in_stock)
 			cmd,i=add_to_cmd(cmd,i,'lastrcv_qty',ms_row.lastrcv_qty)
 			cmd,i=add_to_cmd(cmd,i,'lastrcv_dt',ms_row.lastrcv_dt)
