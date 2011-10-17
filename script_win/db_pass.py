@@ -29,7 +29,7 @@ for lite_row in lite_rows:
 			ms_row=ms_cur.fetchone()
 			print len(ms_row)
 			#print ms_row
-			cmd='python2.7 /home/pearlwhite85/test_proj/arguments.py '
+			cmd='python2.7 /home/pearlwhite85/test_proj/script_lin/arguments.py '
 			print cmd
 			i=0
 			def add_to_cmd(cmd,i,arg, val):
@@ -87,7 +87,6 @@ for lite_row in lite_rows:
 			cmd,i=add_to_cmd(cmd,i,'updt_by',ms_row.updt_by)
 			cmd,i=add_to_cmd(cmd,i,'currency_cost',ms_row.currency_cost)
 			cmd,i=add_to_cmd(cmd,i,'cost_factor',ms_row.cost_factor)
-			break
 			stdin, stdout, stderr = ssh.exec_command(cmd)
 			
 			if stdout:
@@ -95,6 +94,8 @@ for lite_row in lite_rows:
 					lite_con.commit()
 					print stdout.read()
 			print 'yes ', prod_cd
+			if stderr:
+                                print stderr.read()
 			break
 lite_con.close()
 ms_con.close()
