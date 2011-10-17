@@ -1,0 +1,1 @@
+import psycopg2import settings_scriptdef connect_to_unix():	conn = psycopg2.connect(settings_script.connection_string)	cur = conn.cursor()	return conn, cur	def insert_script():	return 0	def update_script():	return 0
