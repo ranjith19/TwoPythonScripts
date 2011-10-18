@@ -1,9 +1,11 @@
 from optparse import OptionParser
+import re
 
 parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
 parser.add_option( "--prod_cd",dest="prod_cd",default=None)
 parser.add_option( "--whs_num", dest="whs_num", default=None)
-parser.add_option( "--lastrcv_qty", dest="lastrcv_qty",type="float", default=None)
+parser.add_option( "--in_stock", dest="in_stock", default=None)
+parser.add_option( "--lastrcv_qty", dest="lastrcv_qty", default=None)
 parser.add_option( "--lastrcv_dt", dest="lastrcv_dt",default=None)
 parser.add_option( "--price_base", dest="price_base",default=None)
 parser.add_option( "--frt_cus", dest="frt_cus",default=None)
@@ -45,50 +47,54 @@ if options.prod_cd == None:
 else:
 	print options.prod_cd
 
-sql_script="INSERT INTO inv_data VALUES(%s,%s,%s,%s,%s,%s,
-										  %s,%s,%s,%s,%s,%s,
-										  %s,%s,%s,%s,%s,%s,
-										  %s,%s,%s,%s,%s,%s,
-										  %s,%s,%s,%s,%s,%s,
-										  %s,%s,%s,%s,%s,%s)"%(options.prod_cd,
-																options.whs_num		,
-																options.in_stock	,
-																options.lastrcv_qty	,
-																options.lastrcv_dt	,
-																options.price_base	,
-																options.frt_cus		,
-																options.prod_duty	,
-																options.handl_fee 	,
-																options.misc_fee 	,
-																options.avg_cost 	,
-																options.lt_sl_dt 	,
-																options.vendor 		,
-																options.lst_order 	,
-																options.ord_dt 		,
-																options.stk_ind 	,
-																options.back_qty 	,
-																options.order_qty 	,
-																options.on_order_qty,
-																options.wip_qty 	,
-																options.rma_qty 	,
-																options.water_qty 	,
-																options.ordersize 	,
-																options.minstock 	,
-																options.inv_loc 	,
-																options.unit_color 	,
-																options.class_cd 	,
-																options.descrip 	,
-																options.def_unit 	,
-																options.updt_dt 	,
-																options.phyc_dt 	,
-																options.image_nm 	,
-																options.oem_cd 		,
-																options.alt_cd 		,
-																options.updt_by  	,
-																options.currency_cost,
-																options.cost_factor )
-
+sql_script="\
+INSERT INTO inv_data \
+VALUES\
+(\
+%s,%s,%s,%s,%s,%s,\
+%s,%s,%s,%s,%s,%s,\
+%s,%s,%s,%s,%s,%s,\
+%s,%s,%s,%s,%s,%s,\
+%s,%s,%s,%s,%s,%s,\
+%s,%s,%s,%s,%s,%s,%s\
+)"
+sql_script=sql_script%( options.prod_cd,
+						options.whs_num,
+						options.in_stock,
+						options.lastrcv_qty,
+						options.lastrcv_dt,
+						options.price_base,
+						options.frt_cus	,
+						options.prod_duty,
+						options.handl_fee ,
+						options.misc_fee ,
+						options.avg_cost ,
+						options.lt_sl_dt ,
+						options.vendor 	,
+						options.lst_order ,
+						options.ord_dt,
+						options.stk_ind ,
+						options.back_qty ,
+						options.order_qty ,
+						options.on_order_qty,
+						options.wip_qty ,
+						options.rma_qty ,
+						options.water_qty ,
+						options.ordersize ,
+						options.minstock ,
+						options.inv_loc ,
+						options.unit_color ,
+						options.class_cd ,
+						options.descrip ,
+						options.def_unit ,
+						options.updt_dt ,
+						options.phyc_dt ,
+						options.image_nm ,
+						options.oem_cd 	,
+						options.alt_cd 	,
+						options.updt_by  ,
+						options.currency_cost,
+						options.cost_factor )
+print re.sub(' +',' ',sql_script)
+print re.sub('\t','\t',sql_script)
 print sql_script
-
-	
-	

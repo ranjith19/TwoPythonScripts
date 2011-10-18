@@ -35,7 +35,7 @@ for lite_row in lite_rows:
 			def add_to_cmd(cmd,i,arg, val):
 				if type(val)==str:
 					if re.match("[^A-Za-z0-9]",val):
-						print "not parsing a null string argument "+arg
+						print "not parsing a null string argument"+arg
 					else:
 						cmd=cmd+"--"+arg+"="+val+"  "
 					i=i+1
@@ -87,6 +87,7 @@ for lite_row in lite_rows:
 			cmd,i=add_to_cmd(cmd,i,'updt_by',ms_row.updt_by)
 			cmd,i=add_to_cmd(cmd,i,'currency_cost',ms_row.currency_cost)
 			cmd,i=add_to_cmd(cmd,i,'cost_factor',ms_row.cost_factor)
+			cmd=re.sub(' +',' ',cmd)
 			print cmd
 			stdin, stdout, stderr = ssh.exec_command(cmd)
 			
