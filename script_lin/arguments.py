@@ -2,6 +2,7 @@ from optparse import OptionParser
 import re
 
 parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
+parser.add_option( "--program_mode",dest="program_mode",default=None)
 parser.add_option( "--prod_cd",dest="prod_cd",default=None)
 parser.add_option( "--whs_num", dest="whs_num", default=None)
 parser.add_option( "--in_stock", dest="in_stock", default=None)
@@ -51,7 +52,7 @@ sql_script="\
 INSERT INTO inv_data \
 VALUES\
 (\
-%s,%s,%s,%s,%s,%s,\
+'%s',%s,%s,%s,%s,%s,\
 %s,%s,%s,%s,%s,%s,\
 %s,%s,%s,%s,%s,%s,\
 %s,%s,%s,%s,%s,%s,\
@@ -95,6 +96,4 @@ sql_script=sql_script%( options.prod_cd,
 						options.updt_by  ,
 						options.currency_cost,
 						options.cost_factor )
-print re.sub(' +',' ',sql_script)
-print re.sub('\t','\t',sql_script)
 print sql_script
