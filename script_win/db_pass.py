@@ -34,12 +34,12 @@ for lite_row in lite_rows:
 			i=0
 			def add_to_cmd(cmd,i,arg, val):
 				if type(val)==str:
-					if re.match("[^A-Za-z]^[0-9]",val):
-						print "not parsing a null string argument"+arg
+					if re.match("[^A-Za-z0-9]",val):
+						print "not parsing a null string argument "+arg
 					else:
 						cmd=cmd+"--"+arg+"="+val+"  "
 					i=i+1
-					print i,':',cmd
+					#print i,':',cmd
 					return cmd,i
 				else:
 					fval=float(val)
@@ -48,7 +48,7 @@ for lite_row in lite_rows:
 					else:
 						cmd=cmd+"--"+arg+"="+str(fval)+"  "
 					i=i+1
-					print i,':',cmd
+					#print i,':',cmd
 					return cmd,i
 				
 			cmd,i=add_to_cmd(cmd,i,'prod_cd',ms_row.prod_cd)  
@@ -87,6 +87,7 @@ for lite_row in lite_rows:
 			cmd,i=add_to_cmd(cmd,i,'updt_by',ms_row.updt_by)
 			cmd,i=add_to_cmd(cmd,i,'currency_cost',ms_row.currency_cost)
 			cmd,i=add_to_cmd(cmd,i,'cost_factor',ms_row.cost_factor)
+			print cmd
 			stdin, stdout, stderr = ssh.exec_command(cmd)
 			
 			if stdout:
