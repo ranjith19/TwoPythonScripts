@@ -2,10 +2,7 @@ import psycopg2
 from optparse import OptionParser
 import re
 import function_script
-import logging
-import datetime
 
-logging.basicConfig(filename='Script_lin.log',level=logging.DEBUG)
 parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
 parser.add_option( "--program_mode",dest="program_mode",default="insert")
 parser.add_option( "--prod_cd",dest="prod_cd",default=' ')
@@ -45,30 +42,16 @@ parser.add_option( "--alt_cd", dest="alt_cd",default=' ')
 parser.add_option( "--updt_by", dest="updt_by",default=' ')
 parser.add_option( "--currency_cost", dest="currency_cost",type="float",default=0.0)
 parser.add_option( "--cost_factor", dest="cost_factor",type="float",default=0.0)
-try:
-	(options, args) = parser.parse_args()
-except:
-	print 'pass options correctly'
-	raise
-try:
-	dbcon,dbcur=function_script.connect_to_db()
-except:
-	print 'error while connecting'
-	raise
-
-if options.program_mode=='update':
-	print 'droppting row:',options.prod_cd
-	try:
-		delete_query="delete from inv_data_bk where prod_cd ='" +options.prod_cd+"';"
-		dbcur.execute(delete_query)
-	except:
-		logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
-		print 'unexpected error while dropping row before updating', prod cd
-		pass
+(options, args) = parser.parse_args()
 
 
+if options.prod_cd == ' ':
+	print 'prod_cd can not be null'
+else:
+	print options.prod_cd
 
-query="\
+dbcon,dbcur=function_script.connect_to_db()
+sql_script="\
 INSERT INTO inv_data_bk \
 VALUES\
 (\
@@ -79,55 +62,46 @@ VALUES\
 %s,%s,%s,%s,%s,%s,\
 %s,%s,%s,%s,%s,%s,%s\
 )"
-	
-insert_query=query%( "'"+options.prod_cd+"'",
-	'"'+options.whs_num+'"',
-	options.in_stock,
-	options.lastrcv_qty,
-	options.lastrcv_dt,
-	options.price_base,
-	options.frt_cus	,
-	options.prod_duty,
-	options.handl_fee ,
-	options.misc_fee ,
-	options.avg_cost ,
-	options.lt_sl_dt ,
-	'"'+options.vendor +'"'	,
-	options.lst_order ,
-	options.ord_dt,
-	'"'+options.stk_ind+'"' ,
-	options.back_qty ,
-	options.order_qty ,
-	options.on_order_qty,
-	options.wip_qty ,
-	options.rma_qty ,
-	options.water_qty ,
-	options.ordersize ,
-	options.minstock ,
-	'"'+options.inv_loc+'"' ,
-	'"'+options.unit_color+'"' ,
-	'"'+options.class_cd+'"',
-	'"'+options.descrip+'"',
-	'"'+options.def_unit+'"' ,
-	options.updt_dt ,
-	options.phyc_dt ,
-	'"'+options.image_nm +'"',
-	'"'+options.oem_cd 	+'"',
-	'"'+options.alt_cd 	+'"',
-	'"'+options.updt_by  +'"',
-	options.currency_cost,
-	options.cost_factor,
-	)
 
-try:
-	print 'creating row:',options.prod_cd
-	logging.info('creating row: '+insert_query)
-	dbcur.execute(sql_script)
-	logging.info('created row: '+insert_query)
-	print 'created row'
-except:
-	logging.error('Error while creating at '+str(datetime.datetime.now())+':unexpected error at '+'  prod cd='+options.prod_cd+'error'+str(sys.exc_info()))
-	print 'unexpected error while dropping row before updating', prod cd
-	pass
+
+sql_script=sql_script%( "'"+options.prod_cd+"'",
+						"'"+options.whs_num+"'",
+						options.in_stock,
+						options.lastrcv_qty,
+						options.lastrcv_dt,
+						options.price_base,
+						options.frt_cus	,
+						options.prod_duty,
+						options.handl_fee ,
+						options.misc_fee ,
+						options.avg_cost ,
+						options.lt_sl_dt ,
+						"'"+options.vendor +"'"	,
+						options.lst_order ,
+						options.ord_dt,
+						"'"+options.stk_ind+"'" ,
+						options.back_qty ,
+						options.order_qty ,
+						options.on_order_qty,
+						options.wip_qty ,
+						options.rma_qty ,
+						options.water_qty ,
+						options.ordersize ,
+						options.minstock ,
+						"'"+options.inv_loc+"'" ,
+						"'"+options.unit_color+"'" ,
+						"'"+options.class_cd+"'",
+						"'"+options.descrip+"'",
+						"'"+options.def_unit+"'" ,
+						options.updt_dt ,
+						options.phyc_dt ,
+						"'"+options.image_nm +"'",
+						"'"+options.oem_cd 	+"'",
+						"'"+options.alt_cd 	+"'",
+						"'"+options.updt_by  +"'",
+						options.currency_cost,
+						options.cost_factor )
+
+dbcur.execute(sql_script)
 dbcon.commit()
 dbcon.close()
