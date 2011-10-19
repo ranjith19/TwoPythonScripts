@@ -14,7 +14,7 @@ CREATE TABLE inv_data_bk
     avg_cost      NUMERIC(21,6) DEFAULT 0,
     lt_sl_dt      NUMERIC(8,0) DEFAULT 0,
     vendor        CHAR(10) ,
-    lst_order     NUMERIC(21,6) DFAULT 0,
+    lst_order     NUMERIC(21,6) DEFAULT 0,
     ord_dt        NUMERIC(8,0) DEFAULT 0,
     stk_ind       CHAR(1),
     back_qty      NUMERIC(21,6) DEFAULT 0,

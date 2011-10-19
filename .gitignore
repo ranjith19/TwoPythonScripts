@@ -2,3 +2,5 @@
 script_win/WindowsScript.py
 */inventory_database
 .gitignore
+installer*
+old_files*

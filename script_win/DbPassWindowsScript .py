@@ -4,7 +4,7 @@ import pyodbc
 import connection_script
 import logging
 import re              # regex module
-import 
+#import 
 
 logging.basicConfig(filename='db_sync.log',level=logging.DEBUG)
 
@@ -12,10 +12,10 @@ lite_con,lite_cur=connection_script.connect_to_sqlite()
 
 ssh=connection_script.connect_to_webserver()
 
-lite_cur.execute("select prod_cd,whs_num,in_stock,lastrcv_qty,lastrcv_dt,price_base,frt_cus,prod_duty,handl_fee,misc_fee,avg_cost,lt_sl_dt,vendor,lst_order,ord_dt,stk_ind,back_qty,order_qty,on_order_qty,wip_qty,rma_qty,water_qty,ordersize,minstock,inv_loc,unit_color,class_cd,descrip,def_unit,updt_dt,phyc_dt,image_nm,oem_cd,alt_cd,updt_by,currency_cost,cost_factor  from inv_data_bk where status='U' or status='N';")
-lite_rows=lite_cur.fetchall()
-print 'total rows:',len(lite_rows)
-for lite_row in lite_rows:
+lite_cur.execute("select prod_cd,whs_num,in_stock,lastrcv_qty,lastrcv_dt,price_base,frt_cus,prod_duty,handl_fee,misc_fee,avg_cost,lt_sl_dt,vendor,lst_order,ord_dt,stk_ind,back_qty,order_qty,on_order_qty,wip_qty,rma_qty,water_qty,ordersize,minstock,inv_loc,unit_color,class_cd,descrip,def_unit,updt_dt,phyc_dt,image_nm,oem_cd,alt_cd,updt_by,currency_cost,cost_factor ,status from inv_data_bk where status='U' or status='N';")
+
+for lite_row in lite_cur:
+        print lite_row
 	row_status=lite_row.status
 	if status=='N':
 		cmd='python2.7 /home/pearlwhite85/test_proj/script_lin/arguments.py  --program_mode=insert '

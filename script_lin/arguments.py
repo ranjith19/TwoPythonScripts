@@ -4,6 +4,7 @@ import re
 import function_script
 import logging
 import datetime
+import sys
 
 logging.basicConfig(filename='Script_lin.log',level=logging.DEBUG)
 parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
@@ -57,14 +58,17 @@ except:
 	raise
 
 if options.program_mode=='update':
-	print 'droppting row:',options.prod_cd
-	try:
-		delete_query="delete from inv_data_bk where prod_cd ='" +options.prod_cd+"';"
-		dbcur.execute(delete_query)
-	except:
-		logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
-		print 'unexpected error while dropping row before updating', prod cd
-		pass
+	dbcur.execute("select * from inv_data_bk where prod_cd ='" +options.prod_cd+"';")
+	dbrow=dbcur.fetchone()
+	if dbrow:
+		print 'droppting row:',options.prod_cd
+		try:
+			delete_query="delete from inv_data_bk where prod_cd ='" +options.prod_cd+"';"
+			dbcur.execute(delete_query)
+		except:
+			logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
+			print 'unexpected error while dropping row before updating', options.prod_cd
+			pass
 
 
 
@@ -122,12 +126,12 @@ insert_query=query%( "'"+options.prod_cd+"'",
 try:
 	print 'creating row:',options.prod_cd
 	logging.info('creating row: '+insert_query)
-	dbcur.execute(sql_script)
+	dbcur.execute(insert_query)
 	logging.info('created row: '+insert_query)
 	print 'created row'
 except:
 	logging.error('Error while creating at '+str(datetime.datetime.now())+':unexpected error at '+'  prod cd='+options.prod_cd+'error'+str(sys.exc_info()))
-	print 'unexpected error while dropping row before updating', prod cd
+	print 'unexpected error while dropping row before creating', options.prod_cd, sys.exc_info()
 	pass
 dbcon.commit()
 dbcon.close()
