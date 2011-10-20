@@ -6,7 +6,8 @@ import logging
 import datetime
 import sys
 
-logging.basicConfig(filename='Script_lin.log',level=logging.DEBUG)
+logging.basicConfig(filename='/home/pearlwhite85/test_proj/script_lin/Script_lin.log',level=logging.DEBUG)
+#logging.info('beginning operation'+str(datetime.datetime.now()))
 parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
 parser.add_option( "--program_mode",dest="program_mode",default="insert")
 parser.add_option( "--prod_cd",dest="prod_cd",default=' ')
@@ -56,7 +57,7 @@ try:
 except:
 	print 'error while connecting'
 	raise
-
+print 'program mode  tried:',options.program_mode
 if options.program_mode=='update':
 	dbcur.execute("select * from inv_data_bk where prod_cd ='" +options.prod_cd+"';")
 	dbrow=dbcur.fetchone()
@@ -64,15 +65,17 @@ if options.program_mode=='update':
 		print 'droppting row:',options.prod_cd
 		try:
 			delete_query="delete from inv_data_bk where prod_cd ='" +options.prod_cd+"';"
+			logging.info("deleting row before for update:"+options.prod_c+' at '+timestamp)
 			dbcur.execute(delete_query)
 		except:
+			logging.error('error:'+delete_query)
 			logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
 			print 'unexpected error while dropping row before updating', options.prod_cd
-			pass
+			raise
 
 
 
-query="\
+query="""\
 INSERT INTO inv_data_bk \
 VALUES\
 (\
@@ -82,10 +85,10 @@ VALUES\
 %s,%s,%s,%s,%s,%s,\
 %s,%s,%s,%s,%s,%s,\
 %s,%s,%s,%s,%s,%s,%s\
-)"
+)"""
 	
 insert_query=query%( "'"+options.prod_cd+"'",
-	'"'+options.whs_num+'"',
+	"'"+options.whs_num+"'",
 	options.in_stock,
 	options.lastrcv_qty,
 	options.lastrcv_dt,
@@ -96,10 +99,10 @@ insert_query=query%( "'"+options.prod_cd+"'",
 	options.misc_fee ,
 	options.avg_cost ,
 	options.lt_sl_dt ,
-	'"'+options.vendor +'"'	,
+	"'"+options.vendor +"'"	,
 	options.lst_order ,
 	options.ord_dt,
-	'"'+options.stk_ind+'"' ,
+	"'"+options.stk_ind+"'" ,
 	options.back_qty ,
 	options.order_qty ,
 	options.on_order_qty,
@@ -108,30 +111,28 @@ insert_query=query%( "'"+options.prod_cd+"'",
 	options.water_qty ,
 	options.ordersize ,
 	options.minstock ,
-	'"'+options.inv_loc+'"' ,
-	'"'+options.unit_color+'"' ,
-	'"'+options.class_cd+'"',
-	'"'+options.descrip+'"',
-	'"'+options.def_unit+'"' ,
+	"'"+options.inv_loc+"'" ,
+	"'"+options.unit_color+"'" ,
+	"'"+options.class_cd+"'",
+	"'"+options.descrip+"'",
+	"'"+options.def_unit+"'" ,
 	options.updt_dt ,
 	options.phyc_dt ,
-	'"'+options.image_nm +'"',
-	'"'+options.oem_cd 	+'"',
-	'"'+options.alt_cd 	+'"',
-	'"'+options.updt_by  +'"',
+	"'"+options.image_nm +"'",
+	"'"+options.oem_cd 	+"'",
+	"'"+options.alt_cd 	+"'",
+	"'"+options.updt_by  +"'",
 	options.currency_cost,
 	options.cost_factor,
 	)
-
+#print insert_query
 try:
+	logging.info('inserting row'+options.prod_cd)
 	print 'creating row:',options.prod_cd
-	logging.info('creating row: '+insert_query)
 	dbcur.execute(insert_query)
-	logging.info('created row: '+insert_query)
-	print 'created row'
+	print 'created  row'
 except:
-	logging.error('Error while creating at '+str(datetime.datetime.now())+':unexpected error at '+'  prod cd='+options.prod_cd+'error'+str(sys.exc_info()))
-	print 'unexpected error while dropping row before creating', options.prod_cd, sys.exc_info()
-	pass
+	logging.error('error while inserting:' +options.prod_cd)
+	print 'error while creating'
 dbcon.commit()
 dbcon.close()
