@@ -65,7 +65,7 @@ if options.program_mode=='update':
 		print 'droppting row:',options.prod_cd
 		try:
 			delete_query="delete from inv_data_bk where prod_cd ='" +options.prod_cd+"';"
-			logging.info("deleting row before for update:"+options.prod_c+' at '+timestamp)
+			logging.info("deleting row before for update:"+options.prod_cd+' at '+timestamp)
 			dbcur.execute(delete_query)
 		except:
 			logging.error('error:'+delete_query)
