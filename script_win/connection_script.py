@@ -17,9 +17,9 @@ import settings_script #has the user names and passwords
 
 def connect_to_mssql(): #connects to MS SQL DB
 	CONNECTION_STRING='DRIVER='+settings_script.MS_SERVER+';SERVER='+settings_script.MS_SERVER_LOC+';DATABASE='+settings_script.MS_DB_NAME
-	connection=pyodbc.connect(CONNECTION_STRING) #connection to database
-	cursor=connection.cursor()#defining a cursor for connection
-	return connection, cursor
+        connection=pyodbc.connect(CONNECTION_STRING) #connection to database
+        cursor=connection.cursor()#defining a cursor for connection
+        return connection, cursor
 
 def connect_to_sqlite(): #connects to SQLITE3 DB
 	connection=sqlite3.connect(settings_script.SQLITE_DB)
