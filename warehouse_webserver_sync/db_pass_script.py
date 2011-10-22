@@ -26,7 +26,8 @@ import datetime
 
 #this function creates the argument for the script on the unix box
 def add_to_cmd(cmd,i,arg, val):
-	if type(val)==str:  #deals wiht strings
+        
+	if type(val)==str :  #deals wiht strings
 		if re.match("[^A-Za-z0-9]",val):
 				pass
 		else:
@@ -66,6 +67,14 @@ def main():
 		lite_cur.execute("select prod_cd,status from inv_data_bk where status='U' or status='N';")
 		lite_rows=lite_cur.fetchall()
 		for lite_row in lite_rows:
+                        if lite_row[0].find('('):
+                                pass_prod_cd=lite_row[0].replace('(','_-')
+                                if pass_prod_cd.find(')'):
+                                        pass_prod_cd=pass_prod_cd.replace(')','-_')
+                                        pass_prod_cd=str(pass_prod_cd)
+                        
+			else:
+                                pass_prod_cd=lit_row[0]
 			# get the data from MS SQL
 			ms_query="select prod_cd,whs_num,in_stock,lastrcv_qty,lastrcv_dt,price_base,frt_cus,prod_duty,handl_fee,misc_fee,avg_cost,lt_sl_dt,vendor,lst_order,ord_dt,stk_ind,back_qty,order_qty,on_order_qty,wip_qty,rma_qty,water_qty,ordersize,minstock,inv_loc,unit_color,class_cd,descrip,def_unit,updt_dt,phyc_dt,image_nm,oem_cd,alt_cd,updt_by,currency_cost,cost_factor  from inv_data where whs_num='1' and prod_cd='%s';"
 			ms_cur.execute(ms_query%(lite_row[0]))
@@ -81,9 +90,9 @@ def main():
 				total_updates+=1
 			
 			i=0# a temporary counter
-						
+			
 			#generating command line arguments        
-			cmd,i=add_to_cmd(cmd,i,'prod_cd',ms_row.prod_cd)  
+			cmd,i=add_to_cmd(cmd,i,'prod_cd',pass_prod_cd)  
 			cmd,i=add_to_cmd(cmd,i,'whs_num',ms_row.whs_num)
 			cmd,i=add_to_cmd(cmd,i,'in_stock',ms_row.in_stock)
 			cmd,i=add_to_cmd(cmd,i,'lastrcv_qty',ms_row.lastrcv_qty)
@@ -128,10 +137,11 @@ def main():
 				stdoutput=stdout.read()
 				print stdoutput
 				prod_cd=re.sub(r'\s', '', ms_row.prod_cd)
-				print stdoutput.find(prod_cd) and  stdoutput.find('created')
+				print stdoutput.find(prod_cd) ,  stdoutput.find('created')
+				
 				#check if the output has the string inserted in it just to be sure. 
                                 #The script there should not be modified without unless it gives update in the same way
-				if (stdoutput.find(prod_cd) and  stdoutput.find('created')):
+				if (stdoutput.find(prod_cd)!=-1 and  stdoutput.find('created')!=-1):
                                         
                                         lite_cur.execute("update inv_data_bk set  status='Y' where prod_cd =%s"%('"' +lite_row[0]+'"'))
                                         rc=lite_cur.rowcount

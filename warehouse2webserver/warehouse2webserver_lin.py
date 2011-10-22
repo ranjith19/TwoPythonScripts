@@ -23,7 +23,7 @@ import sys
 
 def main():
 	#defining logfile
-	logging.basicConfig(filename='/home/pearlwhite85/test_proj/script_lin/Script_lin.log',level=logging.DEBUG)
+	logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/warehouse2webserver.log',level=logging.DEBUG)
 	
 	#logging.info('beginning operation'+str(datetime.datetime.now()))
 	#defining command line options
@@ -105,7 +105,11 @@ def main():
 	%s,%s,%s,%s,%s,%s,\
 	%s,%s,%s,%s,%s,%s,%s\
 	)"""
-		
+	if options.prod_cd.find('_-'):
+		#print options.prod_cd
+		options.prod_cd=options.prod_cd.replace('_-','(')
+		options.prod_cd=options.prod_cd.replace('-_',')')
+			
 	insert_query=query%( "'"+options.prod_cd+"'",
 		"'"+options.whs_num+"'",
 		options.in_stock,
@@ -147,7 +151,7 @@ def main():
 	#print insert_query
 	try:
 		logging.info('inserting row'+options.prod_cd)
-		#print 'creating row:'
+		print 'creating row:'
 		dbcur.execute(insert_query)#creating row
 		print 'created  row',options.prod_cd
 	except:
