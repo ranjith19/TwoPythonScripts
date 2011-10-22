@@ -13,7 +13,7 @@
 #		settings_script.py for the remote_script is correct
 #		double check the filename
 
-import psycopg2#deals with the postgresql db
+import MySQLdb#deals with the mysql db
 from optparse import OptionParser# for dealing with script's arguments
 import re#for dealing regex
 import function_script#contains all the functions needed
@@ -28,7 +28,7 @@ def main():
 	#logging.info('beginning operation'+str(datetime.datetime.now()))
 	#defining command line options
 	parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
-	parser.add_option( "--program_mode",dest="program_mode",default="insert")
+	#parser.add_option( "--program_mode",dest="program_mode",default="insert")
 	parser.add_option( "--prod_cd",dest="prod_cd",default=' ')
 	parser.add_option( "--whs_num", dest="whs_num", default=' ')
 	parser.add_option( "--in_stock", dest="in_stock", type="float",default=0.0)
@@ -77,20 +77,21 @@ def main():
 		print 'error while connecting'
 		raise
 	#print 'program mode  tried:',options.program_mode
-	if options.program_mode=='update':#deleting before updating
-		dbcur.execute("select * from inv_data_bk where prod_cd ='" +options.prod_cd+"';")
-		dbrow=dbcur.fetchone()
-		if dbrow:
-			print 'droppting row:',options.prod_cd
-			try:
-				delete_query="delete from inv_data_bk where prod_cd ='" +options.prod_cd+"';"
-				#logging.info("deleting row before for update:"+options.prod_cd+' at '+timestamp)
-				dbcur.execute(delete_query)
-			except:
-				logging.error('error:'+delete_query)
-				#logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
-				print 'unexpected error while dropping row before updating', options.prod_cd
-				raise
+	
+	dbcur.execute("select * from pearlwhite85.inv_data_bk where prod_cd ='" +options.prod_cd+"';")
+	dbrow=dbcur.fetchone()
+	if dbrow:
+		print 'droppting row:',options.prod_cd
+		try:
+			delete_query="delete from pearlwhite85.inv_data_bk where prod_cd ='" +options.prod_cd+"';"
+			#logging.info("deleting row before for update:"+options.prod_cd+' at '+timestamp)
+			dbcur.execute(delete_query)
+			print delete_query
+		except:
+			logging.error('error:'+delete_query)
+			#logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
+			print 'unexpected error while dropping row before updating', options.prod_cd
+			raise
 
 
 
@@ -150,13 +151,13 @@ def main():
 		)
 	#print insert_query
 	try:
-		logging.info('inserting row'+options.prod_cd)
+		#logging.info('inserting row'+options.prod_cd)
 		print 'creating row:'
 		dbcur.execute(insert_query)#creating row
 		print 'created  row',options.prod_cd
 	except:
 		logging.error('error while inserting:' +options.prod_cd+str(sys.exc_info()))
-		print 'error while creating'
+		print 'error while creating',sys.exc_info()
 	dbcon.commit()
 	dbcon.close()#closing connection
 

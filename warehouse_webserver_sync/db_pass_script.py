@@ -82,13 +82,8 @@ def main():
 			
 			row_status=lite_row[1]#variable to identify if the row is newly inserted or updated
 			
-			if row_status=='N':
-				cmd='python2.7 '+ settings_script.remote_script +' --program_mode=insert '
-				total_inserts+=1
-			elif row_status == 'U':
-				cmd='python2.7 '+ settings_script.remote_script +' --program_mode=update '
-				total_updates+=1
 			
+			cmd='python2.7 '+ settings_script.remote_script 
 			i=0# a temporary counter
 			
 			#generating command line arguments        
