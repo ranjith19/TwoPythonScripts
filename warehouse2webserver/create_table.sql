@@ -1,5 +1,5 @@
-DROP TABLE inv_data_bk;
-CREATE TABLE inv_data_bk
+DROP TABLE pearlwhite85.inv_data_bk;
+CREATE TABLE pearlwhite85.inv_data_bk
   (
     prod_cd       CHAR(21) NOT NULL PRIMARY KEY,
     whs_num       CHAR(8) DEFAULT ' ',
@@ -37,5 +37,6 @@ CREATE TABLE inv_data_bk
     alt_cd        CHAR(20),
     updt_by       CHAR(8),
     currency_cost NUMERIC(21,6) DEFAULT 0,
-    cost_factor   NUMERIC(21,6) DEFAULT 0
+    cost_factor   NUMERIC(21,6) DEFAULT 0,
+    status 	    CHAR(1) DEFAULT 'N' NOT NULL;
   );

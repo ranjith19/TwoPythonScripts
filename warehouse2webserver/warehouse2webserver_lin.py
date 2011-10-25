@@ -86,7 +86,7 @@ def main():
 			delete_query="delete from pearlwhite85.inv_data_bk where prod_cd ='" +options.prod_cd+"';"
 			#logging.info("deleting row before for update:"+options.prod_cd+' at '+timestamp)
 			dbcur.execute(delete_query)
-			print delete_query
+			print options.prod_cd ,' deleted'
 		except:
 			logging.error('error:'+delete_query)
 			#logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
@@ -103,8 +103,8 @@ def main():
 	%s,%s,%s,%s,%s,%s,\
 	%s,%s,%s,%s,%s,%s,\
 	%s,%s,%s,%s,%s,%s,\
-	%s,%s,%s,%s,%s,%s,\
-	%s,%s,%s,%s,%s,%s,%s\
+	%s,%s,%s,%s,%s,CURDATE(),\
+	%s,%s,%s,%s,%s,%s,%s,'N'\
 	)"""
 	if options.prod_cd.find('_-'):
 		#print options.prod_cd
@@ -140,7 +140,7 @@ def main():
 		"'"+options.class_cd+"'",
 		"'"+options.descrip+"'",
 		"'"+options.def_unit+"'" ,
-		options.updt_dt ,
+		#options.updt_dt ,
 		options.phyc_dt ,
 		"'"+options.image_nm +"'",
 		"'"+options.oem_cd 	+"'",
