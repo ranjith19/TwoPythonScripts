@@ -21,30 +21,23 @@ import logging# for logfiles
 import datetime#for generating timestamp
 import sys
 
+#defining logfile
+logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/warehouse2webserver.log',level=logging.DEBUG)
+#logging.info('beginning operation'+str(datetime.datetime.now()))
 
 def create_or_update_products(con,cur):
-	cur.execute("select  prod_cd, in_stock, order_qty, price_base, class_cd from pearlwhite85.inv_data_bk where status='N' ;")
+	cur.execute("select  prod_cd, in_stock, order_qty, price_base, class_cd,status from pearlwhite85.inv_data_bk where status='N' or status='U';")
 	i=0
-	rows = cur.fetchall()
-	for row in rows:
+	for row in cur:
 		
-		flag=None
-		i+=1		
 		Vsku=row[0]
+		
 		Vquantity=row[1]-row[2]-10
 		if Vquantity<0:
 			Vquantity=0
 		Vprice=row[3]+row[3]*0.35
 		Vname=row[4]
-		
-		cur.execute("select * from pearlwhite85.products where sku='%s'"%(Vsku))
-		product_row=cur.fetchone()
-		
-		if prod_row:
-			flag='U'
-		else:
-			flag='N'
-		
+		flag=row[5]
 		if flag=='U':
 			try:
 				uqry="update pearlwhite85.inv_data_bk set  price=%s, quantity=%s where sku='%s' "%(Vprice,Vquanity,Vsku)
@@ -66,16 +59,17 @@ def create_or_update_products(con,cur):
 		
 		cur.execute("update pearlwhite85.inv_data_bk set status='Y' where prod_cd=%s"%(Vsku))
 		con.commit()
-		
+		i+=1
 	return i
 	
 	
-
-def main():
-	#defining logfile
-	logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/warehouse2webserver.log',level=logging.DEBUG)
+			
 	
-	#logging.info('beginning operation'+str(datetime.datetime.now()))
+def main():
+	create_or_update_flag='No'
+	product_table_status='N'
+	
+	
 	#defining command line options
 	parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
 	#parser.add_option( "--program_mode",dest="program_mode",default="insert")
@@ -132,11 +126,13 @@ def main():
 	dbrow=dbcur.fetchone()
 	if dbrow:
 		print 'droppting row:',options.prod_cd
+		
 		try:
 			delete_query="delete from pearlwhite85.inv_data_bk where prod_cd ='" +options.prod_cd+"';"
 			#logging.info("deleting row before for update:"+options.prod_cd+' at '+timestamp)
 			dbcur.execute(delete_query)
 			print options.prod_cd ,' deleted'
+			product_table_status='U'
 		except:
 			logging.error('error:'+delete_query)
 			#logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
@@ -197,7 +193,7 @@ def main():
 		"'"+options.alt_cd 	+"'",
 		"'"+options.updt_by  +"'",
 		options.currency_cost,
-		options.cost_factor,
+		options.cost_factor,product_table_status
 		)
 	#print insert_query
 	try:
@@ -205,16 +201,18 @@ def main():
 		print 'creating row:'
 		dbcur.execute(insert_query)#creating row
 		print 'created  row',options.prod_cd
-		dbcon.commit()
-		
-		create_or_update_products(dbcon,dbcur)
 		
 	except:
 		logging.error('error while inserting:' +options.prod_cd+str(sys.exc_info()))
 		print 'error while creating',sys.exc_info()
-	
+	uc=create_or_update_products(dbcon,dbcur)
+	if uc!=0:
+		print 'total rows updated/created on the products table:',uc
+	else:
+		print 'did not update anything in products!'
+		
+	dbcon.commit()
 	dbcon.close()#closing connection
-	
 
 if __name__ == "__main__":
     main()
