@@ -20,36 +20,114 @@ import function_script#contains all the functions needed
 import logging# for logfiles
 import datetime#for generating timestamp
 import sys
+from warnings import filterwarnings
 
-#defining logfile
-logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/warehouse2webserver.log',level=logging.DEBUG)
-#logging.info('beginning operation'+str(datetime.datetime.now()))
+filterwarnings('ignore', category = MySQLdb.Warning)
 
 def create_or_update_products(con,cur):
-	cur.execute("select  prod_cd, in_stock, order_qty, price_base, class_cd,status from pearlwhite85.inv_data_bk where status='N' or status='U';")
+	cur.execute("select  prod_cd, in_stock, order_qty, price_base, class_cd, descrip from pearlwhite85.inv_data_bk where status='N' ;")
 	i=0
-	for row in cur:
+	rows = cur.fetchall()
+	for row in rows:
 		
+		flag=None
+		i+=1		
 		Vsku=row[0]
-		
 		Vquantity=row[1]-row[2]-10
 		if Vquantity<0:
 			Vquantity=0
-		Vprice=row[3]+row[3]*0.35
-		Vname=row[4]
-		flag=row[5]
+		Vprice=float(row[3])*(1.35)
+		Vname=row[4]+' ('+Vsku+')'
+		Vcat=row[4]
+		Vdesc=row[5]
+		
+		cur.execute("select * from pearlwhite85.products where sku='%s'"%(Vsku))
+		product_row=cur.fetchone()
+		
+		if product_row:
+			flag='U'
+		else:
+			flag='N'
+		
+		print Vsku, Vname
+		
 		if flag=='U':
 			try:
-				uqry="update pearlwhite85.inv_data_bk set  price=%s, quantity=%s where sku='%s' "%(Vprice,Vquanity,Vsku)
+				uqry="""update pearlwhite85.products set  price=%s, quantity=%s, description="%s", updated_at=sysdate() where sku='%s' """%(Vprice,Vquantity,Vsku, Vdesc)
+				
 				cur.execute(uqry)
+				print 'updated row', Vname, Vsku
+				con.commit()
+				
+				#updating categories table
+				selqry="select id from pearlwhite85.products where sku='%s';"%(Vsku)
+				cur.execute(selqry)
+				selrow=cur.fetchone()
+				product_id=selrow[0]
+				
+				catqry="select id from pearlwhite85.categories where name='%s';" %(Vcat)
+				cur.execute(catqry)
+				catrow=cur.fetchone()
+				
+				if catrow:
+					cat_id=catrow[0]
+				else:
+					catqry="insert into pearlwhite85.categories  (name, slug, description, is_active, created_at, updated_at) values ('%s','%s','%s',1,sysdate(),sysdate());"%(Vcat, Vcat, Vcat)
+					cur.execute(catqry)
+					con.commit()
+					catqry="select id from pearlwhite85.categories where name='%s'"%(Vcat)
+					cur.execute(catqry)
+					catrow2=cur.fetchone()
+					cat_id=catrow2[0]
+				print 'prod id, cat_id:',product_id, cat_id
+				linkqry="select * from pearlwhite85.products_categories where product_id=%s and category_id=%s;"%(product_id, cat_id)
+				cur.execute(linkqry)
+				linkrow=cur.fetchone()	
+				if linkrow:
+					pass
+				else:
+					linkqry="insert into pearlwhite85.products_categories (product_id, category_id) values(%s,%s);"%(product_id, cat_id)
+					cur.execute(linkqry)
 				con.commit()
 			except:
 				print 'unexpected error when updating products table at:', Vname, Vsku
 				raise
 		elif flag=='N':
 			try:
-				iqry="insert into pearlwhite85.inv_data_bk (name, sku, price, quantity) values  ('%s','%s',%s,%s) "%(Vname,Vsku,Vprice,Vquantity)
+				iqry="insert into pearlwhite85.products (name, sku, price, quantity, description, is_active, created_at, updated_at) values  ('%s','%s',%s,%s,'%s', 1, sysdate(),sysdate()); "%(Vname,Vsku,Vprice,Vquantity,Vdesc)
 				cur.execute(iqry)
+				con.commit()
+				print 'created row', Vname, Vsku
+				
+				#updating categories table
+				selqry="select id from pearlwhite85.products where sku='%s';"%(Vsku)
+				cur.execute(selqry)
+				selrow=cur.fetchone()
+				product_id=selrow[0]
+				
+				catqry="select id from pearlwhite85.categories where name='%s';" %(Vcat)
+				cur.execute(catqry)
+				catrow=cur.fetchone()
+				
+				if catrow:
+					cat_id=catrow[0]
+				else:
+					catqry="insert into pearlwhite85.categories  (name, slug, description, is_active, created_at, updated_at) values ('%s','%s','%s',1,sysdate(),sysdate());"%(Vcat, Vcat, Vcat)
+					cur.execute(catqry)
+					con.commit()
+					catqry="select id from pearlwhite85.categories where name='%s'"%(Vcat)
+					cur.execute(catqry)
+					catrow2=cur.fetchone()
+					cat_id=catrow2[0]
+				print 'prod id, cat_id:',product_id, cat_id
+				linkqry="select * from pearlwhite85.products_categories where product_id=%s and category_id=%s;"%(product_id, cat_id)
+				cur.execute(linkqry)
+				linkrow=cur.fetchone()	
+				if linkrow:
+					pass
+				else:
+					linkqry="insert into pearlwhite85.products_categories (product_id, category_id) values(%s,%s);"%(product_id, cat_id)
+					cur.execute(linkqry)
 				con.commit()
 			except:
 				print 'unexpected error when updating products table at:', Vname, Vsku
@@ -57,19 +135,22 @@ def create_or_update_products(con,cur):
 		else:
 			print 'Unknown flag:',flag
 		
-		cur.execute("update pearlwhite85.inv_data_bk set status='Y' where prod_cd=%s"%(Vsku))
+		yqry="update pearlwhite85.inv_data_bk set status='Y' where prod_cd='%s';"%(Vsku)
+		#print yqry
+		cur.execute(yqry)
+		if cur.rowcount:
+			print 'affected rows:', cur.rowcount
 		con.commit()
-		i+=1
+			
 	return i
 	
 	
-			
-	
+
 def main():
-	create_or_update_flag='No'
-	product_table_status='N'
+	#defining logfile
+	logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/warehouse2webserver.log',level=logging.DEBUG)
 	
-	
+	#logging.info('beginning operation'+str(datetime.datetime.now()))
 	#defining command line options
 	parser = OptionParser(usage="usage: %prog [options] ", version="%prog 1.0")
 	#parser.add_option( "--program_mode",dest="program_mode",default="insert")
@@ -126,13 +207,11 @@ def main():
 	dbrow=dbcur.fetchone()
 	if dbrow:
 		print 'droppting row:',options.prod_cd
-		
 		try:
 			delete_query="delete from pearlwhite85.inv_data_bk where prod_cd ='" +options.prod_cd+"';"
 			#logging.info("deleting row before for update:"+options.prod_cd+' at '+timestamp)
 			dbcur.execute(delete_query)
 			print options.prod_cd ,' deleted'
-			product_table_status='U'
 		except:
 			logging.error('error:'+delete_query)
 			#logging.error('Error while delete at '+str(datetime.datetime.now())+':unexpected error at '+str(sys.exc_info())+'  prod cd='+options.prod_cd)
@@ -193,7 +272,7 @@ def main():
 		"'"+options.alt_cd 	+"'",
 		"'"+options.updt_by  +"'",
 		options.currency_cost,
-		options.cost_factor,product_table_status
+		options.cost_factor,
 		)
 	#print insert_query
 	try:
@@ -201,18 +280,17 @@ def main():
 		print 'creating row:'
 		dbcur.execute(insert_query)#creating row
 		print 'created  row',options.prod_cd
+		dbcon.commit()
+		
+		
 		
 	except:
 		logging.error('error while inserting:' +options.prod_cd+str(sys.exc_info()))
 		print 'error while creating',sys.exc_info()
-	uc=create_or_update_products(dbcon,dbcur)
-	if uc!=0:
-		print 'total rows updated/created on the products table:',uc
-	else:
-		print 'did not update anything in products!'
-		
-	dbcon.commit()
+	
+	create_or_update_products(dbcon,dbcur)
 	dbcon.close()#closing connection
+	
 
 if __name__ == "__main__":
     main()

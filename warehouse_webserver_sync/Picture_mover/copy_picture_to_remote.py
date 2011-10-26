@@ -1,10 +1,10 @@
-#       db_pass_script.py
+#       copy_picture_to_remote.py
 #       
 #       Copyright 2011 ranjith19 <ranjith19@gmail.com>
 #       
-#       This script extracts new and changed data based on 
-#		results of Sync_script.py from Microsoft SQL server,
-#		and inserts database into the unix box
+#       This script moves pictures from a directory to the remote machine 
+#		if the name of the file matches prod_cd column of
+#		inv_data table in MS SQL database
 #
 #		This script needs connection_script.py  and settings_script.py for working
 #		
@@ -24,60 +24,30 @@ import logging
 import re              # regex module
 import datetime
 
-#this function creates the argument for the script on the unix box
-def add_to_cmd(cmd,i,arg, val):
-        
-	if type(val)==str :  #deals wiht strings
-		if re.match("[^A-Za-z0-9]",val):
-				pass
-		else:
-				cmd=cmd+"--"+arg+"="+val+"  "
-		i=i+1
-		
-		return cmd,i
-	else:	#deals with integers and floats
-		fval=float(val)
-		ival=int(fval)
-		if fval==0:
-				pass
-		else:
-				if fval-ival==0: #checking if it is a integer
-						cmd=cmd+"--"+arg+"="+str(ival)+"  "
-				else:
-						cmd=cmd+"--"+arg+"="+str(fval)+"  "
-				
-		i=i+1
-		return cmd,i
-
+def move_file():
+	pass
 #the main function
 
 def main():
 	now= datetime.datetime.now()
 	timestamp= now.strftime("%Y%m%d%H%M%S")#getting the timestamp 
 	#creating log file
-	logging.basicConfig(filename='logfile\db_pass_script.log',level=logging.DEBUG)
+	logging.basicConfig(filename='copy_pictures_to_remote.log',level=logging.DEBUG)
 	logging.info('begin at'+timestamp)
 	try:
 		lite_con,lite_cur=connection_script.connect_to_sqlite()#connect to sqlite3
 		ms_con, ms_cur=connection_script.connect_to_mssql()#connect to ms sql
 		ssh=connection_script.connect_to_webserver()# connect to unix box
-		total_tries=0
-		
+		total_updates=0
+		total_inserts=0
 		#  picking up the newly updated and inserted data from the sqlite3 DB
-		lite_cur.execute("select prod_cd,status from inv_data_bk where status='U' or status='N';")
-		lite_rows=lite_cur.fetchall()
-		for lite_row in lite_rows:
-                        if lite_row[0].find('('):
-                                pass_prod_cd=lite_row[0].replace('(','_-')
-                                if pass_prod_cd.find(')'):
-                                        pass_prod_cd=pass_prod_cd.replace(')','-_')
-                                        pass_prod_cd=str(pass_prod_cd)
-                        
-			else:
-                                pass_prod_cd=lit_row[0]
+		
 			# get the data from MS SQL
-			ms_query="select prod_cd,whs_num,in_stock,lastrcv_qty,lastrcv_dt,price_base,frt_cus,prod_duty,handl_fee,misc_fee,avg_cost,lt_sl_dt,vendor,lst_order,ord_dt,stk_ind,back_qty,order_qty,on_order_qty,wip_qty,rma_qty,water_qty,ordersize,minstock,inv_loc,unit_color,class_cd,descrip,def_unit,updt_dt,phyc_dt,image_nm,oem_cd,alt_cd,updt_by,currency_cost,cost_factor  from inv_data where whs_num='1' and prod_cd='%s';"
-			ms_cur.execute(ms_query%(lite_row[0]))
+			ms_query="select prod_cd from inv_data where whs_num='1';"
+			ms_cur.execute(ms_query)
+			
+			for row in ms_cur:
+				
 			ms_row=ms_cur.fetchone()#fetch the row
 			
 			row_status=lite_row[1]#variable to identify if the row is newly inserted or updated
@@ -132,9 +102,7 @@ def main():
 				stdoutput=stdout.read()
 				print stdoutput
 				prod_cd=re.sub(r'\s', '', ms_row.prod_cd)
-				#print stdoutput.find(prod_cd) ,  stdoutput.find('created')
-				
-				
+				print stdoutput.find(prod_cd) ,  stdoutput.find('created')
 				
 				#check if the output has the string inserted in it just to be sure. 
                                 #The script there should not be modified without unless it gives update in the same way
@@ -144,7 +112,6 @@ def main():
                                         rc=lite_cur.rowcount
                                         if rc==1:
                                                 lite_con.commit()
-                                                total_tries+=1
                                                 logging.info('created/updated table:'+lite_row[0])
                                                 print 'created/updated table:'+lite_row[0]
                                         else:
@@ -161,9 +128,8 @@ def main():
 		lite_con.close()
 		ms_con.close()
 		ssh.close()
-		print 'total number of updates, inserts  tried:',total_tries
-		
-		return total_tries
+		print 'total updates tried:',total_updates
+		print 'total inserts tried:',total_inserts
 	except KeyboardInterrupt:
                 sys.exit()
 		raise
