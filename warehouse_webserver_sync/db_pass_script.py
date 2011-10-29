@@ -55,7 +55,7 @@ def main():
 	now= datetime.datetime.now()
 	timestamp= now.strftime("%Y%m%d%H%M%S")#getting the timestamp 
 	#creating log file
-	logging.basicConfig(filename='logfile\db_pass_script.log',level=logging.DEBUG)
+	logging.basicConfig(filename='db_pass_script.log')
 	logging.info('begin at'+timestamp)
 	try:
 		lite_con,lite_cur=connection_script.connect_to_sqlite()#connect to sqlite3

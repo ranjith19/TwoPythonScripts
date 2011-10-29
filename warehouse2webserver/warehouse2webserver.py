@@ -39,7 +39,10 @@ def create_or_update_products(con,cur):
 		Vprice=float(row[3])*(1.35)
 		Vname=row[4]+' ('+Vsku+')'
 		Vcat=row[4]
-		Vdesc=row[5]
+		Vdesc=row[5]		
+		Vimage='images/products/main/'+Vsku+'jpg'
+		Vthumb='images/products/thumbnails/'+Vsku+'jpg'
+		
 		
 		cur.execute("select * from pearlwhite85.products where sku='%s'"%(Vsku))
 		product_row=cur.fetchone()
@@ -49,7 +52,7 @@ def create_or_update_products(con,cur):
 		else:
 			flag='N'
 		
-		print Vsku, Vname
+		#print Vsku, Vname
 		
 		if flag=='U':
 			try:
@@ -72,7 +75,7 @@ def create_or_update_products(con,cur):
 				if catrow:
 					cat_id=catrow[0]
 				else:
-					catqry="insert into pearlwhite85.categories  (name, slug, description, is_active, created_at, updated_at) values ('%s','%s','%s',1,sysdate(),sysdate());"%(Vcat, Vcat, Vcat)
+					catqry="insert into pearlwhite85.categories  (name, slug, description, is_active, created_at, updated_at,image,thumbnail) values ('%s','%s','%s',1,sysdate(),sysdate(),'%s','%s');"%(Vcat, Vcat, Vcat,Vimage,Vthumbnail)
 					cur.execute(catqry)
 					con.commit()
 					catqry="select id from pearlwhite85.categories where name='%s'"%(Vcat)

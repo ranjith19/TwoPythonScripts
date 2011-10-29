@@ -9,16 +9,16 @@
 import os
 import datetime
 import logging
-import subprocess
 import sys
 import Sync_script
-import db_pass_script
+
 import time
 
 
 
 def main():
-        first_run=1        
+        first_run=1
+        change_status=0
 	try:
 	   while True:
 			now= datetime.datetime.now()
@@ -34,15 +34,7 @@ def main():
 			except:
 				logging.error('error synchronisng:'+timestamp)
 
-			if change_status!=0 or first_run==1:
-                                first_run=0
-                                try:#trying to call db_pass_script.py for updating the remote DB 
-                                        print 'synchronising remote db'
-                                        db_pass_script.main()
-                                        last_update_time=datetime.datetime.now()
-                                except:
-                                        logging.error('error passing:'+timestamp)
-                        else:
+			if change_status==0 :
                                  
                                 print 'last update happened at:',last_update_time, '. Nothing to syncronise now'
                                 
