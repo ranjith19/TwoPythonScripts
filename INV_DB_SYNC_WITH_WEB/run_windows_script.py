@@ -19,10 +19,11 @@ import time
 def main():
         first_run=1
         change_status=0
+        last_update_time=datetime.datetime.now()
 	try:
 	   while True:
 			now= datetime.datetime.now()
-			last_update_time=now
+			
 			timestamp= now.strftime("%Y%m%d%H%M%S")
 			
 			print """---------- at %s----------"""%(time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime()))
@@ -30,6 +31,8 @@ def main():
 			try:#trying to call Sync_script.py for syncronising local DB 
 				print 'synchronising local db'
 				change_status=Sync_script.main()
+				if change_status!=0:
+                                        last_update_time=now
 				
 			except:
 				logging.error('error synchronisng:'+timestamp)

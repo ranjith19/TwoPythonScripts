@@ -1,7 +1,7 @@
 import Image
 import sys
 import logging
-logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/warehouse2webserver.log',level=logging.DEBUG)
+logging.basicConfig(filename='/home/pearlwhite85/webapps/django1_2_7/syncscripts/warehouse2webserver/generate_thumbnails.log')
 
 
 def generate_and_save_thumbnail(imageFile, h, w, outFile):
