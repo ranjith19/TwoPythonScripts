@@ -6,7 +6,7 @@
 #
 #		This script needs connection_script.py  and settings_script.py for working
 #		
-#		make sure psycopg2 is installed before 
+#		make sure MySQLdb is installed before 
 #		running the script
 #
 # 		also make sure that the path name provided in the
