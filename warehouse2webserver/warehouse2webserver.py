@@ -20,6 +20,7 @@ import function_script#contains all the functions needed
 import logging# for logfiles
 import datetime#for generating timestamp
 import sys
+import delete_items_without_pics
 from warnings import filterwarnings
 
 filterwarnings('ignore', category = MySQLdb.Warning)
@@ -49,10 +50,11 @@ def create_or_update_products(con,cur):
 		Vquantity=row[1]-row[2]-10
 		if Vquantity<0:
 			Vquantity=0
-		Vprice=float(row[3])*(1.35)
-		Vname=row[4]+' ('+Vsku+')'
+		Vprice=float(row[3])/(0.60)
+		Vname=Vsku
+		Vslug=Vsku
 		Vcat=row[4]
-		Vdesc=row[5]		
+		Vdesc=row[5]	
 		Vimage='images/products/main/'+Vsku+'.jpg'
 		Vthumb='images/products/thumbnails/'+Vsku+'.jpg'
 		
@@ -110,7 +112,7 @@ def create_or_update_products(con,cur):
 				raise
 		elif flag=='N':
 			try:
-				iqry="insert into pearlwhite85.products (name, sku, price, quantity, description, is_active, created_at, updated_at,image,thumbnail,image_caption) values  ('%s','%s',%s,%s,'%s', 1, sysdate(),sysdate(),'%s','%s','%s'); "%(Vname,Vsku,Vprice,Vquantity,Vdesc,Vimage,Vthumb,Vsku)
+				iqry="insert into pearlwhite85.products (name, sku, slug,price, quantity, description, is_active, created_at, updated_at,image,thumbnail,image_caption) values  ('%s','%s','%s',%s,%s,'%s', 1, sysdate(),sysdate(),'%s','%s','%s'); "%(Vname,Vsku,Vslug,Vprice,Vquantity,Vdesc,Vimage,Vthumb,Vsku)
 				cur.execute(iqry)
 				con.commit()
 				print 'created row', Vname, Vsku

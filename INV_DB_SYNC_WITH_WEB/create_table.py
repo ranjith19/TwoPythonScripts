@@ -58,7 +58,8 @@ def main():
 			updt_by       CHAR(8),\
 			currency_cost NUMERIC(21,6)   ,\
 			cost_factor   NUMERIC(21,6)   ,\
-			status CHAR(1));"""
+			
+			status CHAR(1),sales_cost NUMERIC(21,6));"""
                         def delete_database():
                             connection, cursor= connection_script.connect_to_sqlite()
                             cursor.execute("""DROP TABLE inv_data_bk;""")

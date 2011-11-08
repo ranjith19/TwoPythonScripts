@@ -64,7 +64,7 @@ def main():
 		total_tries=0
 		
 		#  picking up the newly updated and inserted data from the sqlite3 DB
-		lite_cur.execute("select prod_cd,status from inv_data_bk where status<>'Y' and status<>'V';")
+		lite_cur.execute("select prod_cd,status from inv_data_bk where status<>'Y' and status<>'V' and status<>'E';")
 		lite_rows=lite_cur.fetchall()
 		for lite_row in lite_rows:
 			pass_prod_cd=lite_row[0]
