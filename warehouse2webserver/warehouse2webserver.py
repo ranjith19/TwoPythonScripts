@@ -71,8 +71,8 @@ def create_or_update_products(con,cur):
 		
 		if flag=='U':
 			try:
-				uqry="""update pearlwhite85.products set  price=%s, quantity=%s, description="%s", updated_at=sysdate() where sku='%s' """%(Vprice,Vquantity,Vsku, Vdesc)
-				
+				uqry="""update pearlwhite85.products set  price=%s, quantity=%s, description="%s", updated_at=sysdate() where sku='%s' """%(Vprice,Vquantity, Vdesc, Vsku)
+				#print uqry
 				cur.execute(uqry)
 				print 'updated row', Vname, Vsku
 				con.commit()
@@ -147,6 +147,7 @@ def create_or_update_products(con,cur):
 					linkqry="insert into pearlwhite85.products_categories (product_id, category_id) values(%s,%s);"%(product_id, cat_id)
 					cur.execute(linkqry)
 				con.commit()
+				print 'updated values on products, products_categories and categories table'
 			except:
 				print 'unexpected error when updating products table at:', Vname, Vsku
 				raise

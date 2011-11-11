@@ -90,7 +90,7 @@ def main():
 			row_status=lite_row[1]#variable to identify if the row is newly inserted or updated
 			cmd='python2.7 '+ settings_script.remote_script 
 			i=0# a temporary counter
-			print row_status, 'row status'
+			#print row_status, 'row status'
 			if row_status=='D':
 				cmd,i=add_to_cmd(cmd,i,'program_mode','delete')
 				cmd,i=add_to_cmd(cmd,i,'prod_cd',pass_prod_cd)
